@@ -6,7 +6,7 @@
     <style type="text/css">
         canvas {
             border: 1px solid #eee;
-            border-radius: 5px;
+            border-radius: 10px;
             display: block;
             margin: 50px auto;
             box-shadow: 0px 2px 10px 0px #ddd;
@@ -19,11 +19,11 @@
     <canvas id="canvas" width='800' height='500'></canvas>
 </body>
 <script type="text/javascript">
-    const TOTAL = 100;
-    let v = 0,progress = 90;
-    let perQ = Math.PI / 90;
+    var TOTAL = 100;
+    var v = 0,progress = 100;
+    var perQ = Math.PI / 90;
 
-    let canvas = document.getElementById("canvas"),ctx = canvas.getContext("2d");
+    var canvas = document.getElementById("canvas"),ctx = canvas.getContext("2d");
     
     //灰色圆环
     ctx.beginPath();
@@ -41,8 +41,7 @@
     function draw() {
         if (v < progress) {
             v += 0.5;
-            let h = 60 - parseInt(v*3.6 / 6);//渐变色相环比例
-            console.log(h);
+            var h = 90 - parseInt(v*3.6 / 4);//渐变色相环比例
 
             //画圆点
             ctx.beginPath();
@@ -58,10 +57,10 @@
             ctx.fill();
 
             //画圆弧
-            let q = Math.PI  / 50 * v ;//当前圆弧起点
+            var q = Math.PI  / 50 * v ;//当前圆弧起点
             ctx.beginPath();
             ctx.strokeStyle = "hsl("+h+", 100%, 50%)";
-            ctx.arc(600 , 250 , 100 , q - Math.PI / 2 + Math.PI / 180, q + perQ - Math.PI / 2 )
+            ctx.arc(600 , 250 , 100 , q - Math.PI / 2 + Math.PI / 180, q + perQ - Math.PI / 2)
             ctx.stroke();
             //画进度
             ctx.clearRect(535, 185, 130, 130);
@@ -73,6 +72,7 @@
 
             //循环调用
             requestAnimationFrame(draw);
+            //setTimeout(draw, 1000/60)
         }
     }
     draw();
