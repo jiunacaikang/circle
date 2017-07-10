@@ -19,7 +19,8 @@
 </body>
 <script type="text/javascript">
     const TOTAL = 100;
-    let v = 0,progress = 68;
+    let v = 0,progress = 60;
+    let perQ = Math.PI / 180;
 
     let canvas = document.getElementById("canvas"),ctx = canvas.getContext("2d");
     
@@ -27,30 +28,50 @@
     ctx.beginPath();
     ctx.strokeStyle = "rgba(150,150,150,.1)";
     ctx.lineWidth = 10;
-    ctx.arc(400 , 250 , 100, 0, Math.PI * 2);
+    ctx.arc(200 , 250 , 100, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(150,150,150,.1)";
+    ctx.lineWidth = 10;
+    ctx.arc(600 , 250 , 100, 0, Math.PI * 2);
     ctx.stroke();
 
     function draw() {
         if (v < progress) {
             v += 0.5;
-            let h = parseInt(v*3.6 / 4);//渐变色相环比例
+            let h = 60 - parseInt(v*3.6 / 6);//渐变色相环比例
+            console.log(h);
+
             //画圆点
             ctx.beginPath();
             ctx.fillStyle = "hsl("+h+", 100%, 50%)";
-            ctx.arc(400 + Math.sin(v * Math.PI * 2 / TOTAL) * 100, 250 - Math.cos(v * Math.PI * 2 / TOTAL) * 100, 5, 0, Math.PI * 2);
+            ctx.arc(200 + Math.sin(v * Math.PI * 2 / TOTAL) * 100, 250 - Math.cos(v * Math.PI * 2 / TOTAL) * 100, 5, 0, Math.PI * 2);
             ctx.fill();
-
             //画进度
-            ctx.clearRect(335, 185, 130, 130);
+            ctx.clearRect(135, 185, 130, 130);
             ctx.beginPath();
             ctx.font = "26px Aria";
             ctx.fillStyle = "red";
-            ctx.fillText( parseInt(v,10) + '%', 375, 265);
+            ctx.fillText( parseInt(v,10) + '%', 175, 265);
+            ctx.fill();
+
+            //画圆弧
+            let q = Math.PI  / 50 * v ;//当前圆弧起点
+            ctx.beginPath();
+            ctx.strokeStyle = "hsl("+h+", 100%, 50%)";
+            ctx.arc(600 , 250 , 100 , q - Math.PI / 2 + Math.PI / 180, q + perQ*2 - Math.PI / 2 )
+            ctx.stroke();
+            //画进度
+            ctx.clearRect(535, 185, 130, 130);
+            ctx.beginPath();
+            ctx.font = "26px Aria";
+            ctx.fillStyle = "#f50";
+            ctx.fillText( parseInt(v,10) + '%', 575, 265);
             ctx.fill();
 
             //循环调用
             requestAnimationFrame(draw);
-            //setTimeout(draw, 1000/60);
         }
     }
     draw();
