@@ -10,7 +10,7 @@
             display: block;
             margin: 50px auto;
             box-shadow: 0px 2px 10px 0px #ddd;
-            background: #111;
+            background: #123;
         }
     </style>
 </head>
@@ -57,10 +57,10 @@
             ctx.fill();
 
             //画圆弧
-            var q = Math.PI  / 50 * v ;//当前圆弧起点
+            var q = Math.PI  / 50 * v;//当前圆弧起点
             ctx.beginPath();
             ctx.strokeStyle = "hsl("+h+", 100%, 50%)";
-            ctx.arc(600 , 250 , 100 , q - Math.PI / 2 + Math.PI / 180, q + perQ - Math.PI / 2)
+            ctx.arc(600 , 250 , 100 , q - Math.PI / 2, q + perQ - Math.PI / 2 - Math.PI / 180)
             ctx.stroke();
             //画进度
             ctx.clearRect(535, 185, 130, 130);
