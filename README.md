@@ -1,2 +1,2 @@
 # circle
-canvas circle
+canvas progress circle
