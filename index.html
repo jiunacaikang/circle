@@ -104,7 +104,9 @@
                 //第一种方法
                 //画半径为5的圆点
                 ctx.beginPath();
-                ctx.arc(WIDTH / 4 + Math.sin((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R, HEIGHT / 2 - Math.cos((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R, 5, 0, Math.PI * 2);
+                let startX = WIDTH / 4 + Math.sin((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R,
+                    startY = HEIGHT / 2 - Math.cos((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R
+                ctx.arc(startX, startY, 5, 0, Math.PI * 2);
                 ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
                 ctx.fill();
                 //画进度 先清除上次所画进度
@@ -120,11 +122,10 @@
                 //画扇形
                 ctx.beginPath();
                 ctx.moveTo(WIDTH * 3 / 4, HEIGHT / 2);
-                let curStart = Math.PI / 50 * (OPTIONS.progress + OPTIONS.position);//本次开始画的起点
-                let startDeg = curStart - Math.PI / 360 * OPTIONS.step - Math.PI / 2;
-                let endDeg =  curStart + Math.PI / 360 * OPTIONS.step - Math.PI / 2
+                let curPosition = Math.PI / 50 * (OPTIONS.progress + OPTIONS.position);//本次开始画的起点
+                let startDeg = curPosition - Math.PI / 360 * OPTIONS.step - Math.PI / 2,
+                    endDeg =  curPosition + Math.PI / 360 * OPTIONS.step - Math.PI / 2;
                 ctx.arc(WIDTH * 3 / 4, HEIGHT / 2, R + 5, startDeg, endDeg, false)
-                ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
                 //采用非零环绕原则 隐藏掉中间重叠部分 注释掉这一句可以看到画的扇形
                 !OPTIONS.showSector && ctx.arc(WIDTH * 3 / 4, HEIGHT / 2, R - 5, endDeg, startDeg, true)
                 ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
