@@ -2,81 +2,165 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>canvas progress</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>canvas OPTIONS.progress</title>
     <style type="text/css">
+        .wrap {
+            width: 800px;
+            height: 600px;
+            margin: 50px auto;
+            position: relative;
+        }
+        .tool-bar {
+            position: absolute;
+            top: 0;
+            right: -100px;
+        }
+        #colorPicker,button {
+            width: 80px;
+            height: 30px;
+            outline: none;
+        }
+        button {
+            margin-top: 10px;
+            width: 86px;
+        }
+
         canvas {
-            border: 1px solid #eee;
             border-radius: 10px;
             display: block;
-            margin: 50px auto;
             box-shadow: 0px 2px 10px 0px #ddd;
-            background: #123;
+            background: #000;
+            box-shadow: 5px 5px 15px #555;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="canvas" width='800' height='500'></canvas>
-</body>
-<script type="text/javascript">
-    var TOTAL = 100;
-    var v = 0,progress = 100;
-    var perQ = Math.PI / 90;
+    <div class="wrap">
+        <div class="tool-bar">
+            <input type="color" id="colorPicker">
+            <br>
+            <button id="showSector">显示扇形</button>
+            <br>
+            <button id="start">开始</button>
+        </div>
+        <canvas id="canvas" width="800" height="500"></canvas>
+    </div>
 
-    var canvas = document.getElementById("canvas"),ctx = canvas.getContext("2d");
-    
-    //灰色圆环
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(150,150,150,.1)";
-    ctx.lineWidth = 10;
-    ctx.arc(200 , 250 , 100, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = "rgba(150,150,150,.1)";
-    ctx.lineWidth = 10;
-    ctx.arc(600 , 250 , 100, 0, Math.PI * 2);
-    ctx.stroke();
-
-    function draw() {
-        if (v < progress) {
-            v += 0.5;
-            var h = 90 - parseInt(v*3.6 / 4);//渐变色相环比例
-
-            //画圆点
-            ctx.beginPath();
-            ctx.fillStyle = "hsl("+h+", 100%, 50%)";
-            ctx.arc(200 + Math.sin(v * Math.PI * 2 / TOTAL) * 100, 250 - Math.cos(v * Math.PI * 2 / TOTAL) * 100, 5, 0, Math.PI * 2);
-            ctx.fill();
-            //画进度
-            ctx.clearRect(135, 185, 130, 130);
-            ctx.beginPath();
-            ctx.font = "26px Aria";
-            ctx.fillStyle = "red";
-            ctx.fillText( parseInt(v,10) + '%', 175, 265);
-            ctx.fill();
-
-            //画圆弧
-            var q = Math.PI  / 50 * v;//当前圆弧起点
-            ctx.beginPath();
-            ctx.strokeStyle = "hsl("+h+", 100%, 50%)";
-            ctx.arc(600 , 250 , 100 , q - Math.PI / 2, q + perQ - Math.PI / 2 - Math.PI / 180)
-            ctx.stroke();
-            //画进度
-            ctx.clearRect(535, 185, 130, 130);
-            ctx.beginPath();
-            ctx.font = "26px Aria";
-            ctx.fillStyle = "hsl("+h+", 100%, 50%)";
-            ctx.fillText( parseInt(v,10) + '%', 575, 265);
-            ctx.fill();
-
-            //循环调用
-            requestAnimationFrame(draw);
-            //setTimeout(draw, 1000/60)
+    <script type="text/javascript">
+        function $$(id) {
+            return document.getElementById(id)
         }
-    }
-    draw();
-</script>
+
+        const canvas = $$('canvas'), ctx = canvas.getContext("2d");
+        const HUNDRED = 100, WIDTH = 800, HEIGHT = 500, R = 100, FONTSIZE = 22;
+        let OPTIONS = {
+            range: [0, 220],//渐变色范围
+            closed: true,//是否闭合渐变色
+            position: 0,//开始位置
+            step: 3,
+            v: 2, //速度
+            progress: 0, //进度
+            total:100,//总进度
+            showSector: false
+        }
+
+        function init() {
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            OPTIONS.progress = 0;
+            OPTIONS = Object.assign(OPTIONS, {
+                closed: Math.random() > 0.5,
+                progress: 0,
+                total: Math.random() > 0.7 ? 100 : Math.ceil(Math.random() * HUNDRED),
+            })
+
+            //画两个灰色圆环
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(150,150,150,.3)";
+            ctx.lineWidth = 20;
+            ctx.arc(WIDTH / 4, HEIGHT / 2, R, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(150,150,150,.3)";
+            ctx.lineWidth = 20;
+            ctx.arc(WIDTH * 3 / 4, HEIGHT / 2, R, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function draw() {
+            if (OPTIONS.range[0] > OPTIONS.range[1]) return false
+
+            if (OPTIONS.progress < OPTIONS.total) {
+                OPTIONS.progress += OPTIONS.v * 0.25;
+
+                //判断是否选用颜色闭合属性
+                let curRange = parseInt(OPTIONS.range[0] + (OPTIONS.closed ? 2 : 1) * OPTIONS.progress * (OPTIONS.range[1] - OPTIONS.range[0]) / HUNDRED);
+                let hslRange = curRange > OPTIONS.range[1] ? 2 * OPTIONS.range[1] - curRange : curRange;//渐变色相环比例范围
+
+
+                //第一种方法
+                //画半径为5的圆点
+                ctx.beginPath();
+                ctx.arc(WIDTH / 4 + Math.sin((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R, HEIGHT / 2 - Math.cos((OPTIONS.position + OPTIONS.progress) * Math.PI * 2 / HUNDRED) * R, 5, 0, Math.PI * 2);
+                ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
+                ctx.fill();
+                //画进度 先清除上次所画进度
+                ctx.clearRect(WIDTH / 4 - R / 2, HEIGHT / 2 - R / 2, R, R);
+                ctx.beginPath();
+                ctx.font = `${FONTSIZE}px Aria`;
+                ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
+                //画进度
+                ctx.fillText(Math.min(OPTIONS.total, parseInt(OPTIONS.progress, 10)) + '%', WIDTH / 4 - FONTSIZE , HEIGHT / 2 + FONTSIZE / 2);
+
+
+                //第二种方法
+                //画扇形
+                ctx.beginPath();
+                ctx.moveTo(WIDTH * 3 / 4, HEIGHT / 2);
+                let curStart = Math.PI / 50 * (OPTIONS.progress + OPTIONS.position);//本次开始画的起点
+                let startDeg = curStart - Math.PI / 360 * OPTIONS.step - Math.PI / 2;
+                let endDeg =  curStart + Math.PI / 360 * OPTIONS.step - Math.PI / 2
+                ctx.arc(WIDTH * 3 / 4, HEIGHT / 2, R + 5, startDeg, endDeg, false)
+                ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
+                //采用非零环绕原则 隐藏掉中间重叠部分 注释掉这一句可以看到画的扇形
+                !OPTIONS.showSector && ctx.arc(WIDTH * 3 / 4, HEIGHT / 2, R - 5, endDeg, startDeg, true)
+                ctx.fillStyle = "hsl(" + hslRange + ", 100%, 50%)";
+                ctx.fill();
+
+                //画进度 先清除上次所画进度
+                ctx.clearRect(WIDTH * 3 / 4 - R / 2, HEIGHT / 2 - R / 2, R, R);
+                ctx.beginPath();
+                ctx.font = `${FONTSIZE}px Aria`;
+                ctx.fillStyle = "hsl("+ hslRange +", 100%, 50%)";
+                //画进度
+                ctx.fillText( parseInt(OPTIONS.progress,10) + '%', WIDTH * 3 / 4 - FONTSIZE, HEIGHT / 2 + FONTSIZE / 2);
+
+                //循环调用
+                requestAnimationFrame(draw);
+                //setTimeout(draw, 1000/60)
+            }
+        }
+
+        init();
+
+        $$("start").onclick = function() {
+            init();
+            draw();
+        }
+
+        $$("showSector").onclick = function() {
+            OPTIONS.showSector = !OPTIONS.showSector;
+            $$("showSector").innerText = OPTIONS.showSector ? '关闭扇形' : '显示扇形'
+        }
+
+        $$('colorPicker').onchange = function() {
+            $$('canvas').style.backgroundColor = $$('colorPicker').value
+        }
+    </script>
+
+</body>
 
 </html>
