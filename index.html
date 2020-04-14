@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title>canvas OPTIONS.progress</title>
+    <title>canvas progress</title>
     <style type="text/css">
         .wrap {
             width: 800px;
@@ -44,7 +44,7 @@
             <br>
             <button id="showSector">显示扇形</button>
             <br>
-            <button id="start">开始</button>
+            <button id="start">重新开始</button>
         </div>
         <canvas id="canvas" width="800" height="500"></canvas>
     </div>
@@ -145,6 +145,7 @@
         }
 
         init();
+        draw();
 
         $$("start").onclick = function() {
             init();
